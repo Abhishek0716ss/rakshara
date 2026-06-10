@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Verify OTP" %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card animate-fade-in-up">
+        
+        <h1 class="auth-title">{% trans "Verify OTP" %}</h1>
+        <p class="auth-subtitle">
+            {% blocktrans %}A 6-digit code has been sent to:{% endblocktrans %}
+            <br><strong>{{ email }}</strong>
+        </p>
+
+        <form method="post" class="auth-form needs-loader">
+            {% csrf_token %}
+            
+            <div class="form-group" style="text-align: center;">
+                <label for="id_otp" class="form-label">{% trans "Enter your code" %}</label>
+                <input type="text" name="otp" maxlength="6" inputmode="numeric"
+                       class="form-control otp-input"
+                       placeholder="------" required id="id_otp">
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                {% trans "Verify & Continue" %}
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <p class="text-muted small">{% trans "Didn’t receive the OTP?" %}</p>
+            <a href="#" class="btn btn-outline">{% trans "Resend OTP" %}</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .otp-input {
+        letter-spacing: 8px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        max-width: 200px;
+        margin: 0 auto;
+        padding: 0.75rem;
+    }
+</style>
+{% endblock %}

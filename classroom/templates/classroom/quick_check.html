@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Quick Health Check" %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card animate-fade-in-up">
+        
+        <div class="text-center mb-4">
+            <h1 class="auth-title">{% trans "Quick Health Check" %}</h1>
+            <p class="auth-subtitle" style="margin-bottom: 0.5rem;">
+                {{ vc }} — {% trans "Student" %} {{ idx|add:1 }} {% trans "of" %} {{ total }}
+            </p>
+            <h4 class="fw-semibold text-dark mb-0">{{ student.user.get_full_name|default:student.user.username }}</h4>
+            <small class="text-muted">{% trans "Roll No" %}: {{ student.roll_no }}</small>
+        </div>
+
+        <form method="post" class="needs-loader">
+            {% csrf_token %}
+            <input type="hidden" name="idx" value="{{ idx }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">{% trans "Heart Rate (bpm)" %}</label>
+                    <input type="number" name="heart_rate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "SpO₂ (%)" %}</label>
+                    <input type="number" step="0.1" name="spo2" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Breathing Rate" %}</label>
+                    <input type="number" step="0.1" name="breathing_rate" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Temperature (°C)" %}</label>
+                    <input type="number" step="0.1" name="temperature" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Height (cm)" %}</label>
+                    <input type="number" step="0.1" name="height_cm" class="form-control" value="{{ student.height_cm }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">{% trans "Weight (kg)" %}</label>
+                    <input type="number" step="0.1" name="weight_kg" class="form-control" value="{{ student.weight_kg }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'classroom_detail' vc.id %}" class="btn btn-outline">
+                    ← {% trans "Back" %}
+                </a>
+                <button type="submit" class="btn btn-success">
+                    {% trans "Save & Check" %} →
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if prediction_label %}
+<div class="modal-overlay" id="resultModal">
+    <div class="modal-card animate-fade-in-up glow-{{ prediction_label|lower }}">
+        
+        <div class="modal-emoji">
+        {% if "healthy" in prediction_label|lower %}😄
+        {% elif "mild" in prediction_label|lower or "moderate" in prediction_label|lower %}😐
+        {% else %}😟
+        {% endif %}
+        </div>
+        <h3 class="modal-title">{{ prediction_label }}</h3>
+        <p class="modal-text">{% trans "Prediction Score" %}: <strong>{{ prediction_score }}</strong></p>
+
+        <div class="modal-actions">
+            {% if "mild" in prediction_label|lower or "moderate" in prediction_label|lower or "critical" in prediction_label|lower or "high" in prediction_label|lower %}
+            <form method="post" class="needs-loader" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="alert" value="1">
+                <button type="submit" class="btn btn-danger">
+                    {% trans "Send Alert" %}
+                </button>
+            </form>
+            {% endif %}
+
+            <a href="?idx={{ idx|add:1 }}" class="btn btn-success">
+                {% trans "Next Student" %} →
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if invalid_email %}
+<div class="modal-overlay" id="invalidEmailModal">
+    <div class="modal-card animate-fade-in-up glow-warning">
+        
+        <div class="modal-emoji">⚠️</div>
+        <h3 class="modal-title" style="color: var(--color-warning);">{% trans "Invalid Parent Email" %}</h3>
+        <p class="modal-text">{% trans "The registered parent email is invalid or missing." %}</p>
+        <div class="modal-actions">
+          <a href="?idx={{ idx|add:1 }}" class="btn btn-success" style="width:100%;">{% trans "Next Student" %} →</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem; /* Added vertical spacing */
+    }
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+    }
+    @media (max-width: 576px) {
+        .form-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 2000;
+    }
+    .modal-card {
+        background: var(--color-surface);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        max-width: 420px;
+        width: 90%;
+        border-top: 5px solid var(--color-border);
+    }
+    
+    /* --- NEW EMOJI STYLE --- */
+    .modal-emoji {
+        font-size: 4rem;
+        line-height: 1;
+        margin-bottom: 1rem;
+    }
+    /* --- END NEW STYLE --- */
+
+    .modal-title { 
+        font-size: 1.75rem; 
+        color: var(--color-text);
+        margin-top: 0; /* Removed top margin */
+    }
+    .modal-text { font-size: 1rem; color: var(--color-text-muted); }
+    
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+    .modal-actions .btn, .modal-actions form {
+        flex: 1;
+    }
+    .modal-actions .btn {
+        width: 100%;
+    }
+
+    /* Glow Colors (Status Borders) */
+    .glow-healthy { border-top-color: var(--color-success); }
+    .glow-mild, .glow-moderate { border-top-color: var(--color-warning); }
+    .glow-critical, .glow-high { border-top-color: var(--color-danger); }
+    .glow-warning { border-top-color: var(--color-warning); }
+</style>
+{% endblock %}

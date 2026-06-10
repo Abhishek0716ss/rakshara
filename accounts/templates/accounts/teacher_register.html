@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Teacher Registration" %}{% endblock %}
+
+{% block content %}
+<div class="auth-page-wrapper">
+    <div class="auth-card animate-fade-in-up" style="max-width: 800px;"> <h1 class="auth-title">{% trans "Teacher Registration" %}</h1>
+        <p class="auth-subtitle">{% trans "Manage your classroom health insights." %}</p>
+
+        <form method="post" class="auth-form needs-loader">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="form-group span-2">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-group span-2">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                    {{ form.email }}
+                    {{ form.email.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {{ form.password1.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {{ form.password2.errors }}
+                </div>
+
+                <div class="form-group span-2 password-rules">
+                    {{ form.password1.help_text }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.school.id_for_label }}" class="form-label">{{ form.school.label }}</label>
+                    {{ form.school }}
+                    {{ form.school.errors }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.verification_id.id_for_label }}" class="form-label">{{ form.verification_id.label }}</label>
+                    {{ form.verification_id }}
+                    {{ form.verification_id.errors }}
+                </div>
+                
+                <div class="form-group span-2">
+                    <label for="{{ form.contact.id_for_label }}" class="form-label">{{ form.contact.label }}</label>
+                    {{ form.contact }}
+                    {{ form.contact.errors }}
+                </div>
+
+                <div class="form-group span-2">
+                    <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                    {{ form.address }}
+                    {{ form.address.errors }}
+                </div>
+
+            </div> <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                {% trans "Register" %}
+            </button>
+        </form>
+
+        <div class="otp-hint">
+            <strong>{% trans "Note" %}:</strong> {% blocktrans %}A 6-digit OTP will be sent to your
+            email for verification.{% endblocktrans %}
+        </div>
+
+        <div class="auth-links">
+            <p>{% trans "Already registered?" %}</p>
+            <a href="{% url 'login' %}" class="btn btn-outline">{% trans "Login Here" %}</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Manually styling the form fields */
+    .auth-form input[type="text"],
+    .auth-form input[type="email"],
+    .auth-form input[type="password"],
+    .auth-form input[type="number"],
+    .auth-form input[type="date"],
+    .auth-form select,
+    .auth-form textarea {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        font-size: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        background-color: var(--color-surface);
+        color: var(--color-text);
+    }
+    .auth-form select {
+        height: calc(1.5em + 1.7rem + 2px); /* Matches input height */
+    }
+    .auth-form textarea {
+        min-height: 100px;
+        font-family: var(--font-family);
+    }
+
+    .auth-form input:focus,
+    .auth-form select:focus,
+    .auth-form textarea:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+    
+    /* --- Grid Layout --- */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .form-grid .span-2 {
+        grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .form-grid .span-2 {
+            grid-column: span 1;
+        }
+    }
+    
+    /* --- Password Rules Styling --- */
+    .password-rules .helptext {
+        background-color: var(--color-primary-light);
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        list-style-type: disc;
+        color: var(--color-text-muted);
+        padding-left: 30px;
+        margin: 0;
+    }
+    .password-rules .helptext li {
+        margin-bottom: 0.25rem;
+    }
+
+    /* --- OTP Hint Box --- */
+    .otp-hint {
+        background: var(--color-primary-light);
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+</style>
+{% endblock %}
